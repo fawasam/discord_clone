@@ -3,11 +3,10 @@ import { db } from "./db";
 
 export const initialProfile = async () => {
   const { userId } = auth();
+  console.log("userId", userId);
+
   const user = await currentUser();
 
-  console.log("====================================");
-  console.log(user?.id);
-  console.log("====================================");
   if (!user) {
     return auth().redirectToSignIn();
   }
