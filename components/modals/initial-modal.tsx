@@ -1,4 +1,7 @@
 "use client";
+import { useEffect, useState } from "react";
+import { Input } from "@/components/ui/input";
+import FileUpload from "@/components/file-upload";
 import {
   Dialog,
   DialogContent,
@@ -21,10 +24,10 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { useEffect, useState } from "react";
-
+import { useRouter } from "next/navigation";
+import axios from "axios";
 export const InitialModal = () => {
+  const router = useRouter();
   // To remove hydration error
   const [isMounted, setIsMounted] = useState(false);
   useEffect(() => {
@@ -40,7 +43,14 @@ export const InitialModal = () => {
 
   const isLoading = form.formState.isSubmitting;
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+    try {
+      await axios.post("/api/servers", values);
+      form.reset();
+      router.refresh();
+      window.location.reload();
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   if (!isMounted) return null;
@@ -60,7 +70,22 @@ export const InitialModal = () => {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <div className="space-y-8 px-6">
               <div className="flex items-center justify-center text-center">
-                TODO :Image Upload
+                <FormField
+                  control={form.control}
+                  name="imageUrl"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-secondary/70">
+                        <FileUpload
+                          endpoint="serverImage"
+                          value={field.value}
+                          onChange={field.onChange}
+                        />
+                      </FormLabel>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
               <FormField
                 control={form.control}
